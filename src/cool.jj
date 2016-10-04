@@ -1,0 +1,165 @@
+options
+{
+  STATIC = false;
+  DEBUG_LOOKAHEAD = true;
+}
+
+/*
+* PARSER_BEGIN(Cool) e PARSER_END(Cool)
+* Cool corresponde à classe que abrigará o AS 
+* CoolTokenManager é a classe que abrigará o AL
+*/
+
+PARSER_BEGIN(Cool)
+
+package parser;
+import java.io.*;
+public class Cool{
+	final static String Version = "Cool Compiler - Version 1.0 - 2016";
+	boolean Menosshort = false; // saída resumida = falso
+  	// Define o método "main" da classe Cool
+ 	public static void main(String[] args) throws ParseException{
+		String filename = ""; // nome do arquivo a ser analisado
+		Cool parser; // analisador léxico/sintático
+		int i;
+
+		boolean ms = false;
+
+		System.out.println(Version);
+		// lê os parâmetros passados para o compilador
+		for(i = 0; i< args.length - 1; i++) {
+		  	if(args[i].toLowerCase().equals("-short"))
+		  		ms = true;
+		  	else {
+		    	System.out.println("Usage is: java Coll [-short] inputfile");
+		    	System.exit(0);
+		  	}
+        }
+        if(args[i].equals("-")) {
+          // lê da entrada-padrão
+          System.out.println("Lendo a entrada padrão .. ");
+          parser = new Cool(System.in);
+        }else {
+          // lê do arquivo
+          filename = args[args.length-1];
+          System.out.printls("Leitura do arquivo " + filename + ". . .");
+          try {
+            parser = new Cool(new java.io.FileInputStream(filename));
+          }
+          catch(java.io.FileNotFoundException e) {
+            System.out.println("File " + filename + "not found.");
+            return;
+          }
+        }
+        parser.Menosshort = ms;
+        // chama o método que faz a análise
+        parser.program();
+
+        // verifica se houve erro léxico
+        if(parser.token_sourse.foundLexError() != 0)
+        	System.out.println(parser.token_source.foundLexError() + "Lexical Errors found");
+        else
+        	System.out.println("Program successfully analized.");   
+	} // main
+	// método auxiliar
+	static public String im(int x) {
+	  int k;
+	  String s;
+	  s = tokenImage[x];
+	  k = s.lastIndexOf("\"");
+	  try { s = s.substring(1,k); }
+	  catch (StringIndexOutOfBoundsException e)
+	  {}
+	  return s;
+	}
+}// cool
+
+PARSER_END(Cool)
+
+/* Caracteres que devem ser desprezados  */
+SKIP :
+{
+ 	 " "
+	| "\r"
+	| "\t"
+	| "\n"
+    | < "--" (~["\r", "\n"])* >
+    | < "(*" > : ML_COMMENT_STATE
+    | "\\"
+}
+
+<ML_COMMENT_STATE> SKIP :
+{
+  < "*)" > : DEFAULT 
+| < ~[] >
+}
+
+//KEYWORDS
+
+TOKEN:
+{
+	  <CLASSE : "class" >
+	| <ELSE : "else" >
+	| <FALSE : "false" >
+	| <FI : "fi" >
+	| <IF : "if" >
+	| <IN : "in" >
+	| <INHERITS : "inherits" >
+	| <ISVOID : "isvoid" >
+	| <LET : "let" >
+	| <LOOP : "loop" >
+	| <POOL : "pool" >
+	| <THEN : "then" >
+	| <WHILE : "while" >
+	| <CASE : "case" >
+	| <ESAC : "esac" >
+	| <SCASE : ">=" >
+	| <NEW : "new" >
+	| <OF : "of" >
+	| <NOT : "not" >
+	| <TRUE : "true" >
+	
+}
+
+/*
+* ([0-9])+ - > Conjunto de dígitos de 0 até 9, uma ou mais vezes 
+* [A-Z]([a-z,A-Z,0-9,_])* - > Começar com letra maiúscula, seguido de letras, números e _
+* [a-z]([a-z,A-Z,0-9,_])* - > Começar com letras minúsculas, seguido de letras, números e _
+*/
+TOKEN:
+{
+	  <INT : "Int" >
+	| <STRING: "String" >
+	| <BOOL : "Bool" >
+	| <NUMERO : (["0"-"9"])+ >
+	| <TIPO : ["A"-"Z"] (["a"-"z","A"-"Z","0"-"9","_"])* >
+	| <ID : ["a"-"z"] (["a"-"z","A"-"Z","0"-"9","_"])* >	 
+}
+
+TOKEN:
+{
+	  <SOMA : "+" >
+	| <SUBTRAI : "-" >
+	| <MULTIPLICA : "*" >
+	| <DIVIDE : "/" >
+	| <ATRIB : "<-" >
+	| <MENOR : "<" >
+	| <MENORIGUAL : "<=" >
+	| <IGUAL : "=" >
+	| <COMPLEMENTO : "~" >
+}
+
+TOKEN:
+{
+	  <APARENTESES : "(" >
+	| <FPARENTESES : ")" >
+	| <ACHAVES : "{" >
+	| <FCHAVES : "}" >
+	| <PONTO : "." >
+	| <ARROBA : "@" >
+	| <PVIRGULA : ";" >
+	| <DOISPONTOS : ":" >
+	| <VIRGULA: "," >
+	| <ASPAS : "\"" >
+}
+
