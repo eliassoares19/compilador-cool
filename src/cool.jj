@@ -12,9 +12,9 @@ options
 
 PARSER_BEGIN(Cool)
 
-package parser;
 import java.io.*;
 public class Cool{
+	
 	final static String Version = "Cool Compiler - Version 1.0 - 2016";
 	boolean Menosshort = false; // saída resumida = falso
   	// Define o método "main" da classe Cool
@@ -37,12 +37,12 @@ public class Cool{
         }
         if(args[i].equals("-")) {
           // lê da entrada-padrão
-          System.out.println("Lendo a entrada padrão .. ");
+          System.out.println("Reading from standard input .. ");
           parser = new Cool(System.in);
         }else {
           // lê do arquivo
           filename = args[args.length-1];
-          System.out.printls("Leitura do arquivo " + filename + ". . .");
+          System.out.println("Reading from file " + filename + ". . .");
           try {
             parser = new Cool(new java.io.FileInputStream(filename));
           }
@@ -53,13 +53,19 @@ public class Cool{
         }
         parser.Menosshort = ms;
         // chama o método que faz a análise
-        parser.program();
+        Token t = new Token ();
+     	do {
+
+			t = parser.getNextToken(); //Obtém o próximo token
+			//String nomeToken = tokenImage[t.kind]; //guarda o nome do token na string
+
+		} while(t.kind!=0); //condicao de parada: final do arquivo (constante eof 0 )
 
         // verifica se houve erro léxico
-        if(parser.token_sourse.foundLexError() != 0)
+        if(parser.token_source.foundLexError() != 0)
         	System.out.println(parser.token_source.foundLexError() + "Lexical Errors found");
         else
-        	System.out.println("Program successfully analized.");   
+        	System.out.println("Program successfully analized.");
 	} // main
 	// método auxiliar
 	static public String im(int x) {
@@ -72,9 +78,19 @@ public class Cool{
 	  {}
 	  return s;
 	}
+	
 }// cool
 
 PARSER_END(Cool)
+
+TOKEN_MGR_DECLS :
+{
+	int countLexError = 0;
+	public int foundLexError()
+	{
+		return countLexError;
+	}
+}  
 
 /* Caracteres que devem ser desprezados  */
 SKIP :
